@@ -1,0 +1,17 @@
+{% extends '../base.html' %}
+
+{% block title %}
+  Проверка НДФЛ
+{% endblock title %}
+
+{% block main %}
+  <main>
+    <form action="" method="POST" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="inputNDFLTable">Провека расчёта НДФЛ</label>
+        <input class="form-control" type="file" id="inputNDFLTable" accept=".xlsx, .xls" required>
+      </div>
+      <button type="submit" class="btn btn-secondary">Проверить</button>
+    </form>
+  </main>
+{% endblock main %}

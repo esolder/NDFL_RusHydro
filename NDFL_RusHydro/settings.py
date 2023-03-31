@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     # ----- 3rd-party apps ------
 
     # ------- custom apps -------
-    'ndfl_inspector.apps.NdflInspectorConfig'
+    'ndfl_inspector.apps.NdflInspectorConfig',
 ]
 
 MIDDLEWARE = [
