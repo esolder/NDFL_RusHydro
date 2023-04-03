@@ -38,8 +38,15 @@ class CheckNDFLView(TemplateView):
         except IndexError:
             error_text = 'Ошибка, укажите верные настройки'
             return render(request, self.template, {'error': error_text})
+        except TypeError:
+            error_text = 'Ошибка обработки данных из файла'
+            return render(request, self.template, {'error': error_text})
         
-        outcome_excel = generate_outcome_excel(income_ndfl_table)
+        try:
+            outcome_excel = generate_outcome_excel(income_ndfl_table)
+        except TypeError:
+            error_text = 'Ошибка обработки данных из файла'
+            return render(request, self.template, {'error': error_text})
 
         outcome_bytes = BytesIO()
         outcome_excel.save(outcome_bytes)
