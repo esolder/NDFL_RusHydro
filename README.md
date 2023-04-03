@@ -23,16 +23,6 @@ python local_installer.py
 
 - Создайте файл `.env`, содержащий переменные окружения (список переменных окружения можно найти далее)
 
-- Создайте миграции:
-    ```bash
-    python manage.py makemigrations
-    ```
-
-- Создайте миграции для приложения `ndfl_inspector`:
-    ```bash
-    python manage.py makemigrations ndfl_inspector
-    ```
-
 - Выполните миграции:
     ```bash
     python manage.py migrate
@@ -41,6 +31,6 @@ python local_installer.py
 ### Переменные окружения
 - `DJANGO_SECRET_KEY` (обязательно) - секретный ключ django
 - `DEBUG` (опционально) - режим отладки (по умолчанию True)
-- `ALLOWED_HOSTS` (опционально) - разрешённые хосты (по умолчанию пустой список)
+- `ALLOWED_HOSTS` (опционально) - разрешённые хосты (по умолчанию любые)
 - `DJANGO_DATABASE` (опционально) - настройки базы данных (по умолчанию примет значение переменной DEFAULT_DATABASE)
 - `DJANGO_STATICFILES_DIRS` (опционально) - список дополнительных папок статиков (по умолчанию пустой список)

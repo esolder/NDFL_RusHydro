@@ -9,8 +9,6 @@ def main():
         with open('.env', 'w') as file:
             file.write(f'DJANGO_SECRET_KEY={secret_key}')
 
-    os.system('python manage.py makemigrations')
-    os.system('python manage.py makemigrations ndfl_inspector')
     os.system('python manage.py migrate')
 
 if __name__ == '__main__':
