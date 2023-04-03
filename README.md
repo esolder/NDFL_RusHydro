@@ -1,7 +1,10 @@
 # Сервис для проверки корректности исчисления НДФЛ
 Тестовое задание для РусГидро
+
 [Текст тестового задания](test_task_text.md)
+
 [Пример входных данных](example/example_data.xlsx)
+
 [Форма для выходных данных](example/rept_header.xlsx)
 ![screenshot](example/screenshot.jpg)
 
