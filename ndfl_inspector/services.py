@@ -1,4 +1,5 @@
 from collections import namedtuple
+from typing import List, Optional
 
 import openpyxl
 from openpyxl.cell.cell import Cell
@@ -16,7 +17,7 @@ DEVIATION_COLUMN_NUM = 6
 
 def read_income_excel(filepath: str,
                       start_row: int,
-                      column_nums: dict) -> list:
+                      column_nums: dict[str, int]) -> List[namedtuple]:
     income_file = openpyxl.load_workbook(filepath, read_only=True)
     income_sheet = income_file.active
     columns = ('branch', 'employee', 'ndfl_base', 'custom_total')
@@ -37,7 +38,7 @@ def read_income_excel(filepath: str,
     return income_ndfl_table
 
 
-def generate_outcome_excel(income_ndfl_table: list) -> openpyxl.Workbook:
+def generate_outcome_excel(income_ndfl_table: List[namedtuple]) -> openpyxl.Workbook:
     outcome_workbook = openpyxl.Workbook()
     outcome_sheet = outcome_workbook.active
     for row_number, row in enumerate(income_ndfl_table, 1):
@@ -65,7 +66,7 @@ def generate_outcome_excel(income_ndfl_table: list) -> openpyxl.Workbook:
     return outcome_workbook
 
 
-def _calculate_ndfl(ndfl_base: float) -> int:
+def _calculate_ndfl(ndfl_base: Optional[float] = None) -> int:
     if not ndfl_base:
         return 0
     if ndfl_base < TAX_THRESHOLD:
@@ -73,7 +74,8 @@ def _calculate_ndfl(ndfl_base: float) -> int:
     return round(ndfl_base * PERCENT_AFTER_THRESHOLD)
 
 
-def _calculate_deviation(custom_total: int | None, calc: int) -> int:
+def _calculate_deviation(custom_total: Optional[int] = None,
+                         calc: int = 0) -> int:
     return custom_total - calc if custom_total else -calc
 
 
