@@ -1,33 +1,35 @@
 from collections import namedtuple
-from io import BytesIO
 
 import openpyxl
+from openpyxl.cell.cell import Cell
+from openpyxl.styles import PatternFill
 from openpyxl.worksheet.worksheet import Worksheet
 
 
 TAX_THRESHOLD = 5000000
 PERCENT_BEFORE_THRESHOLD = 0.13
 PERCENT_AFTER_THRESHOLD = 0.15
-A_LETTER_NUMBER = ord('A')
+RIGHT_COLOR = '00FF00'
+WRONG_COLOR = 'FF0000'
+DEVIATION_COLUMN_NUM = 6
 
 
-def read_income_excel(filepath: str, start_row: int) -> list:
+def read_income_excel(filepath: str,
+                      start_row: int,
+                      column_nums: dict) -> list:
     income_file = openpyxl.load_workbook(filepath, read_only=True)
     income_sheet = income_file.active
-    columns = (
-        'branch',
-        'employee',
-        'income',
-        'tax',
-        'ndfl_base',
-        'custom_calculation',
-        'withheld_tax',
-    )
+    columns = ('branch', 'employee', 'ndfl_base', 'custom_total')
     EmployeeNDFL = namedtuple('EmployeeNDFL', columns)
 
     income_ndfl_table = []
     for row in income_sheet.iter_rows(values_only=True, min_row=start_row):
-        ndfl_row = EmployeeNDFL(*row)
+        ndfl_row = EmployeeNDFL(
+            row[column_nums['branch_column_num'] - 1],
+            row[column_nums['employee_column_num'] - 1],
+            row[column_nums['tax_base_column_num'] - 1],
+            row[column_nums['custom_total_column_num'] - 1],
+        )
         if ndfl_row.employee:
             income_ndfl_table.append(ndfl_row)
 
@@ -35,34 +37,32 @@ def read_income_excel(filepath: str, start_row: int) -> list:
     return income_ndfl_table
 
 
-def generate_outcome_excel(income_ndfl_table: list) -> BytesIO:
-    outcome_file = openpyxl.Workbook()
-    outcome_sheet = outcome_file.active
+def generate_outcome_excel(income_ndfl_table: list) -> openpyxl.Workbook:
+    outcome_workbook = openpyxl.Workbook()
+    outcome_sheet = outcome_workbook.active
     for row_number, row in enumerate(income_ndfl_table, 1):
         calculation = _calculate_ndfl(row.ndfl_base)
 
-        deviation = _calculate_deviation(row.custom_calculation, calculation)
+        deviation = _calculate_deviation(row.custom_total, calculation)
 
         result_row = (
             row.branch,
             row.employee,
             row.ndfl_base,
-            row.custom_calculation,
+            row.custom_total,
             calculation,
             deviation,
         )
         outcome_sheet.append(result_row)
 
+        deviation_cell = outcome_sheet.cell(row=row_number,
+                                            column=DEVIATION_COLUMN_NUM)
+        _colorize_deviation_cell(deviation_cell, deviation)
+
 
     _generate_outcome_header(outcome_sheet)
 
-    outcome_bytes = BytesIO()
-
-    outcome_file.save(outcome_bytes)
-
-    outcome_bytes.seek(0)
-
-    return outcome_bytes
+    return outcome_workbook
 
 
 def _calculate_ndfl(ndfl_base: float) -> int:
@@ -73,8 +73,16 @@ def _calculate_ndfl(ndfl_base: float) -> int:
     return round(ndfl_base * PERCENT_AFTER_THRESHOLD)
 
 
-def _calculate_deviation(custom_calc: int | None, calc: int) -> int:
-    return custom_calc - calc if custom_calc else -calc
+def _calculate_deviation(custom_total: int | None, calc: int) -> int:
+    return custom_total - calc if custom_total else -calc
+
+
+def _colorize_deviation_cell(deviation_cell: Cell, deviation: int) -> None:
+    if deviation == 0:
+        fill_color = RIGHT_COLOR
+    else:
+        fill_color = WRONG_COLOR
+    deviation_cell.fill = PatternFill('solid', fgColor=fill_color)
 
 
 def _generate_outcome_header(sheet: Worksheet) -> None:
