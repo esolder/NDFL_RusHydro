@@ -29,9 +29,11 @@ class CheckNDFLView(TemplateView):
             return render(request, self.template, {'error': error_text}) 
 
         try:
-            income_ndfl_table = read_income_excel(income_excel,
-                                                  first_data_row_num,
-                                                  column_nums)
+            income_ndfl_table = read_income_excel(
+                income_excel,
+                first_data_row_num,
+                column_nums,
+            )
         except BadZipFile:
             error_text = 'Ошибка загрузки файла, возможно файл неверного формата'
             return render(request, self.template, {'error': error_text})
@@ -51,6 +53,8 @@ class CheckNDFLView(TemplateView):
         outcome_bytes = BytesIO()
         outcome_excel.save(outcome_bytes)
         outcome_bytes.seek(0)
-        return FileResponse(outcome_bytes,
-                            as_attachment=True,
-                            filename='outcome.xlsx')
+        return FileResponse(
+            outcome_bytes,
+            as_attachment=True,
+            filename='outcome.xlsx',
+        )

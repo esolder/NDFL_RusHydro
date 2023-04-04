@@ -56,8 +56,10 @@ def generate_outcome_excel(income_ndfl_table: List[namedtuple]) -> openpyxl.Work
         )
         outcome_sheet.append(result_row)
 
-        deviation_cell = outcome_sheet.cell(row=row_number,
-                                            column=DEVIATION_COLUMN_NUM)
+        deviation_cell = outcome_sheet.cell(
+            row=row_number,
+            column=DEVIATION_COLUMN_NUM,
+        )
         _colorize_deviation_cell(deviation_cell, deviation)
 
 
